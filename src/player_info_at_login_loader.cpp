@@ -15,16 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _PLAYER_INFO_AT_LOGIN_LOADER_H_
-#define _PLAYER_INFO_AT_LOGIN_LOADER_H_
-
 // From SC
 void AddSC_PlayerInfoAtLogin();
 
 // Add all
-void AddPlayerInfoAtLoginScripts()
+void Addmod_player_info_at_loginScripts()
 {
     AddSC_PlayerInfoAtLogin();
 }
-
-#endif /* _PLAYER_INFO_AT_LOGIN_LOADER_H_ */

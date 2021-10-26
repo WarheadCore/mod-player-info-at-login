@@ -17,10 +17,11 @@
 
 #include "Log.h"
 #include "ScriptMgr.h"
-#include "GameConfig.h"
+//#include "GameConfig.h"
+#include "Config.h"
 #include "Chat.h"
 #include "Player.h"
-#include "GameTime.h"
+//#include "GameTime.h"
 #include "ModuleLocale.h"
 
 enum StringLocales : uint8
@@ -35,8 +36,6 @@ enum StringLocales : uint8
     PIAL_LOCALE_MAX
 };
 
-#define MODULE_NAME "mod-player-info-at-login"
-
 class PlayerInfoAtLogin_Player : public PlayerScript
 {
 public:
@@ -44,32 +43,33 @@ public:
 
     void OnLogin(Player* player) override
     {
-        if (!CONF_GET_BOOL("PlayerInfoAtLogin.Enable"))
+        if (!sConfigMgr->GetOption<bool>("PlayerInfoAtLogin.Enable", false))
             return;
 
         uint8 accountLevel = static_cast<uint8>(player->GetSession()->GetSecurity());
 
         // #1. Prefix
-        sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_PREFIX);
+        sModuleLocale->SendPlayerMessage(player, "PIAL_LOCALE_MSG_PREFIX");
 
         // #2. Welcome msg
-        sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_HI, player->GetName().c_str());
+        sModuleLocale->SendPlayerMessage(player, "PIAL_LOCALE_MSG_HI", player->GetName());
 
         // #3. Account level if > 0
         if (accountLevel)
-            sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_GM_LEVEL, accountLevel);
+            sModuleLocale->SendPlayerMessage(player, "PIAL_LOCALE_MSG_GM_LEVEL", accountLevel);
 
         // #4. IP address
-        sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_IP, player->GetSession()->GetRemoteAddress().c_str());
+        sModuleLocale->SendPlayerMessage(player, "PIAL_LOCALE_MSG_IP", player->GetSession()->GetRemoteAddress());
 
         // #5. World online
-        sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_ONLINE, sWorld->GetPlayerCount(), sWorld->GetMaxActiveSessionCount());
+        sModuleLocale->SendPlayerMessage(player, "PIAL_LOCALE_MSG_ONLINE", sWorld->GetPlayerCount(), sWorld->GetMaxActiveSessionCount());
 
         // #6. World uptime
-        sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_UPTIME, secsToTimeString(GameTime::GetUptime()).c_str());
+        //sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_UPTIME, secsToTimeString(GameTime::GetUptime()).c_str());
+        sModuleLocale->SendPlayerMessage(player, "PIAL_LOCALE_MSG_UPTIME", secsToTimeString(sWorld->GetUpdateTime()));
 
         // #7. Prefix again
-        sModuleLocale->SendPlayerMessage(player, MODULE_NAME, PIAL_LOCALE_MSG_PREFIX);
+        sModuleLocale->SendPlayerMessage(player, "PIAL_LOCALE_MSG_PREFIX");
     }
 };
 
@@ -78,15 +78,10 @@ class PlayerInfoAtLogin_World : public WorldScript
 public:
     PlayerInfoAtLogin_World() : WorldScript("PlayerInfoAtLogin_World") { }
 
-    void OnAfterConfigLoad(bool /*reload*/) override
-    {
-        sGameConfig->AddOption<bool>("PlayerInfoAtLogin.Enable");
-    }
-
-    void OnStartup() override
-    {
-        sModuleLocale->CheckStrings(MODULE_NAME, PIAL_LOCALE_MAX);
-    }
+    //void OnAfterConfigLoad(bool /*reload*/) override
+    //{
+    //    sGameConfig->AddOption<bool>("PlayerInfoAtLogin.Enable");
+    //}
 };
 
 // Group all custom scripts
